@@ -1,24 +1,24 @@
 id: L10
-name: 엇갈림
-optimalMoves: 18
-solution: UBUTDDRTUULLURTRBB
+name: 둘씩 둘
+optimalMoves: 13
+solution: URBLBLTUTDDBB
 layer 0
-#--.
--#--
----#
-----
+---
+-#-
+.--
+---
 layer 1
-----
-#--#
---$#
---@-
+---
+---
+-#-
+---
 layer 2
-----
-.---
----$
-----
+---
+-$-
+$--
+-#-
 layer 3
-----
-----
-----
-----
+-#-
+---
+-@-
+.--

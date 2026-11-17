@@ -1,24 +1,24 @@
 id: L09
-name: 우물
-optimalMoves: 14
-solution: UURBBDDLDRBRTT
+name: 첫 구멍
+optimalMoves: 8
+solution: TDDLTLBB
 layer 0
+#--
 ---
---O
----
+.-#
 ---
 layer 1
----
-#$-
+--@
+--#
 ---
 ---
 layer 2
+---
+--$
 -$-
----
----
 #--
 layer 3
+--O
 ---
 ---
-@--
---.
+---

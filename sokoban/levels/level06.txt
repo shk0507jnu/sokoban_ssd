@@ -1,24 +1,10 @@
 id: L06
-name: 기둥 옆
-optimalMoves: 10
-solution: DLULDDBDTT
+name: 계단식
+optimalMoves: 5
+solution: RTLTR
 layer 0
----
----
---#
----
+@--
 layer 1
---@
 -$-
----
----
 layer 2
----
----
----
----
-layer 3
----
--#-
----
-.#-
+--.

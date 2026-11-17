@@ -1,0 +1,24 @@
+id: L18
+name: 마지막 방
+optimalMoves: 27
+solution: ULTLBDRDRUUTUBBLLDRDBLTTUTD
+layer 0
+##.
+--#
+---
+$O-
+layer 1
+---
+-$.
+---
+---
+layer 2
+#--
+$--
+-$@
+---
+layer 3
+#--
+---
+-##
+.-#

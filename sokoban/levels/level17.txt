@@ -1,0 +1,24 @@
+id: L17
+name: 탑 쌓기
+optimalMoves: 28
+solution: RRDTUDRUBUTULTDBBLUTLTRBBBRD
+layer 0
+----
+----
+--.-
+----
+layer 1
+--#-
+----
+@---
+-#--
+layer 2
+--$-
+----
+-#$$
+----
+layer 3
+--.-
+---.
+--#-
+----

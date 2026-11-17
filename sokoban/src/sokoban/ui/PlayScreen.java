@@ -26,8 +26,9 @@ final class PlayScreen implements Screen {
     private final Session session;
     private final IsoRenderer renderer = new IsoRenderer();
     private final Camera cam = new Camera();
+    /** 한 층짜리 레벨(1~3단계): 2D 탑뷰로 고정하고 시점 회전·z축 이동을 막는다. */
+    private final boolean flat;
     private boolean layerFocus;
-    private int dragX, dragY;
 
     private Mode mode = Mode.PLAYING;
     private StepResult animStep;
@@ -46,6 +47,23 @@ final class PlayScreen implements Screen {
         this.levelIndex = levelIndex;
         this.level = app.repo.levels.get(levelIndex);
         this.session = new Session(level, app.config);
+        this.flat = level.h == 1;
+        // 첫 3D 레벨(앞 레벨이 모두 한 층)이면 탑뷰에서 시작해 3D 시점으로 확장하는 연출을 건다.
+        if (flat) {
+            cam.snapToTopView();
+        } else if (isFirstMultiLayerLevel()) {
+            cam.expandFromTopView();
+        } else {
+            cam.snapToDefaultView();
+        }
+    }
+
+    /** 이 레벨보다 앞선 레벨이 모두 한 층짜리(2D)라서, 이 레벨이 3D로 넘어가는 첫 레벨인가. */
+    private boolean isFirstMultiLayerLevel() {
+        for (int i = 0; i < levelIndex; i++) {
+            if (app.repo.levels.get(i).h > 1) return false;
+        }
+        return true;
     }
 
     // ---------- 갱신 ----------
@@ -126,12 +144,25 @@ final class PlayScreen implements Screen {
     private void playKey(KeyEvent e) {
         int k = e.getKeyCode();
         switch (k) {
-            case KeyEvent.VK_UP, KeyEvent.VK_W -> move(cam.mapKey(Direction.UP));
-            case KeyEvent.VK_DOWN, KeyEvent.VK_S -> move(cam.mapKey(Direction.DOWN));
-            case KeyEvent.VK_LEFT, KeyEvent.VK_A -> move(cam.mapKey(Direction.LEFT));
-            case KeyEvent.VK_RIGHT, KeyEvent.VK_D -> move(cam.mapKey(Direction.RIGHT));
-            case KeyEvent.VK_Q, KeyEvent.VK_PAGE_UP, KeyEvent.VK_SPACE -> move(Direction.ABOVE);
-            case KeyEvent.VK_E, KeyEvent.VK_PAGE_DOWN, KeyEvent.VK_SHIFT -> move(Direction.BELOW);
+            // WASD: 화면 기준 평면 이동 (한글 입력기는 KeyNormalizer가 영문 키로 보정한다)
+            case KeyEvent.VK_W -> move(cam.mapKey(Direction.UP));
+            case KeyEvent.VK_A -> move(cam.mapKey(Direction.LEFT));
+            case KeyEvent.VK_S -> move(cam.mapKey(Direction.DOWN));
+            case KeyEvent.VK_D -> move(cam.mapKey(Direction.RIGHT));
+            // ↑ / ↓: z축 위·아래. 한 층짜리 2D 레벨에서는 쓸 z가 없다
+            case KeyEvent.VK_UP -> {
+                if (!flat) move(Direction.ABOVE);
+            }
+            case KeyEvent.VK_DOWN -> {
+                if (!flat) move(Direction.BELOW);
+            }
+            // ← / →: 시점 회전 (45°씩, 8방향). ← = 시점이 왼쪽으로 돈다. 2D 탑뷰에서는 고정
+            case KeyEvent.VK_LEFT -> {
+                if (!flat) cam.rotateStep(1);
+            }
+            case KeyEvent.VK_RIGHT -> {
+                if (!flat) cam.rotateStep(-1);
+            }
             case KeyEvent.VK_Z -> {
                 finishAnim();
                 session.undo();
@@ -140,9 +171,10 @@ final class PlayScreen implements Screen {
                 finishAnim();
                 session.redo();
             }
-            case KeyEvent.VK_OPEN_BRACKET, KeyEvent.VK_COMMA -> cam.rotateQuarter(-1);
-            case KeyEvent.VK_CLOSE_BRACKET, KeyEvent.VK_PERIOD -> cam.rotateQuarter(1);
-            case KeyEvent.VK_V -> cam.resetView();
+            case KeyEvent.VK_V -> {
+                if (flat) cam.snapToTopView();
+                else cam.resetView();
+            }
             case KeyEvent.VK_TAB -> layerFocus = !layerFocus;
             case KeyEvent.VK_R -> reset();
             case KeyEvent.VK_ESCAPE -> {
@@ -165,24 +197,6 @@ final class PlayScreen implements Screen {
             if (r != JOptionPane.OK_OPTION) return;
         }
         session.reset();
-    }
-
-    @Override
-    public void mousePressed(int x, int y) {
-        if (mode != Mode.PLAYING) return;
-        dragX = x;
-        dragY = y;
-        cam.beginDrag();
-    }
-
-    @Override
-    public void mouseDragged(int x, int y) {
-        if (mode == Mode.PLAYING) cam.drag(x - dragX, y - dragY);
-    }
-
-    @Override
-    public void mouseReleased(int x, int y) {
-        cam.endDrag();
     }
 
     @Override
@@ -254,13 +268,33 @@ final class PlayScreen implements Screen {
         Gfx.right(g, "이동 " + session.moves() + " / 최적 " + level.optimalMoves, w - 24, 40);
         g.setFont(Theme.font(Font.PLAIN, 15f));
         g.setColor(Theme.TEXT_DIM);
-        Gfx.right(g, "층 " + (level.z(session.state().player) + 1) + " / " + level.h
-                + "   되돌리기 " + session.undoCount() + "회", w - 24, 64);
+        Gfx.right(g, flat
+                ? "2D 탑뷰   되돌리기 " + session.undoCount() + "회"
+                : "층 " + (level.z(session.state().player) + 1) + " / " + level.h
+                        + "   되돌리기 " + session.undoCount() + "회", w - 24, 64);
 
         g.setFont(Theme.font(Font.PLAIN, 14f));
         g.setColor(Theme.TEXT_DIM);
-        Gfx.centered(g, "방향키/WASD 평면 이동   Q·Space 위   E·Shift 아래   Z 되돌리기   Y 다시 하기   R 리셋   Esc 일시정지", w / 2, h - 38);
-        Gfx.centered(g, "[ ] 카메라 회전   마우스 드래그 회전·기울기   Tab 층 강조" + (layerFocus ? "(켜짐)" : "") + "   V 시점 초기화", w / 2, h - 16);
+        if (flat) {
+            helpLine(g, w, "W A S D 이동 (2D 탑뷰 고정)", h - 38);
+            helpLine(g, w, "Z 되돌리기   Y 다시 하기   R 리셋   Esc 일시정지", h - 16);
+            return;
+        }
+        helpLine(g, w, "W A S D 평면 이동   ↑ ↓ 위·아래   ← → 시점 회전(45°)", h - 38);
+        helpLine(g, w, "Z 되돌리기   Y 다시 하기   R 리셋   Esc 일시정지   V 시점 초기화   Tab 층 강조"
+                + (layerFocus ? "(켜짐)" : ""), h - 16);
+    }
+
+    /** 하단 도움말 한 줄. 창이 좁으면 글자를 줄여 화면 밖으로 나가지 않게 한다. */
+    private void helpLine(Graphics2D g, int w, String text, int y) {
+        float size = 14f;
+        g.setFont(Theme.font(Font.PLAIN, size));
+        while (size > 9f && g.getFontMetrics().stringWidth(text) > w - 48) {
+            size -= 1f;
+            g.setFont(Theme.font(Font.PLAIN, size));
+        }
+        g.setColor(Theme.TEXT_DIM);
+        Gfx.centered(g, text, w / 2, y);
     }
 
     private void dim(Graphics2D g, int w, int h) {

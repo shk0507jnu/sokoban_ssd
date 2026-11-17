@@ -43,7 +43,8 @@ public final class Engine {
     /** 플레이어가 들어갈 수 있는 칸인가(블록 점유는 여기서 따지지 않는다). */
     private static boolean walkable(Level lv, GameState s, int idx) {
         return switch (lv.tile(idx)) {
-            case EMPTY, GOAL -> true;
+            // ICE·PORTAL: 플레이어는 평범하게 걷는다. 빙판 미끄러짐과 포탈 전송은 후속 엔진 PR에서 구현한다(지금은 빈 칸과 같다).
+            case EMPTY, GOAL, ICE, PORTAL -> true;
             case HOLE -> !s.isHole(idx); // 메워진 구멍은 평범한 빈 칸
             case WALL -> false;
         };

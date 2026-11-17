@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * 레벨 텍스트 파서 (FR-5.1).
@@ -23,13 +24,18 @@ import java.util.Set;
  * solution: RR           (LevelTool이 기록)
  * star3: 1.2             (선택, 별 기준 덮어쓰기)
  * star2: 1.6             (선택)
+ * pull: true              (선택, 상자 당기기 허용. 기본 false)
  * layer 0
  * @$-.
  * </pre>
  *
- * 문자: {@code #}벽 {@code -}(또는 공백)빈 공간 {@code .}목표 {@code O}구멍 {@code $}블록 {@code *}목표 위 블록
+ * 문자: {@code #}벽 {@code -}(또는 공백)빈 공간 {@code .}목표 {@code O}구멍 {@code =}메워진 구멍(처음부터 평지)
+ * {@code ~}빙판 {@code A}{@code B}포탈 {@code $}블록 {@code *}목표 위 블록
  * {@code @}플레이어 {@code +}목표 위 플레이어. 층은 {@code layer N}으로 나눈다(0부터 연속, 0이 맨 아래).
  * 격자 밖은 고체다.
+ *
+ * <p>포탈은 문자마다 정확히 두 칸이 있어야 한다(레벨 디자인 M-04). 두 칸은 서로의 짝이며 같은 층일 필요는 없다.
+ * 레벨 에디터가 내보내는 2D 맵은 {@code layer 0} 한 층짜리 레벨로 그대로 읽힌다.
  */
 public final class LevelParser {
     private LevelParser() {
@@ -107,7 +113,8 @@ public final class LevelParser {
         if (s3 != null && s2 != null && s2 < s3) {
             throw new LevelFormatException(source, metaLine.get("star2"), "star2는 star3 이상이어야 한다.");
         }
-        Set<String> known = Set.of("id", "name", "optimalMoves", "solution", "star3", "star2");
+        boolean pull = boolMeta(source, meta, metaLine, "pull", false);
+        Set<String> known = Set.of("id", "name", "optimalMoves", "solution", "star3", "star2", "pull");
         for (String k : meta.keySet()) {
             if (!known.contains(k)) {
                 throw new LevelFormatException(source, metaLine.get(k), "알 수 없는 메타데이터 '" + k + "'");
@@ -128,6 +135,9 @@ public final class LevelParser {
         List<Integer> holes = new ArrayList<>();
         int player = -1;
         int goalCount = 0;
+        // 포탈: 문자 → 셀 목록 / 처음 나온 줄 번호(오류 보고용)
+        Map<Character, List<Integer>> portalCells = new TreeMap<>();
+        Map<Character, Integer> portalFirstLine = new HashMap<>();
 
         for (int z = 0; z < h; z++) {
             List<String> rows = layerRows.get(z);
@@ -139,12 +149,15 @@ public final class LevelParser {
                     char c = row.charAt(x);
                     int idx = (z * d + y) * w + x;
                     TileType t;
-                    boolean block = false, pl = false;
+                    boolean block = false, pl = false, filledHole = false;
                     switch (c) {
                         case ' ', '-' -> t = TileType.EMPTY;
                         case '#' -> t = TileType.WALL;
                         case '.' -> t = TileType.GOAL;
                         case 'O' -> t = TileType.HOLE;
+                        case '=' -> { t = TileType.HOLE; filledHole = true; }
+                        case '~' -> t = TileType.ICE;
+                        case 'A', 'B' -> t = TileType.PORTAL;
                         case '$' -> { t = TileType.EMPTY; block = true; }
                         case '*' -> { t = TileType.GOAL; block = true; }
                         case '@' -> { t = TileType.EMPTY; pl = true; }
@@ -154,7 +167,11 @@ public final class LevelParser {
                     }
                     tiles[idx] = t;
                     if (t == TileType.GOAL) goalCount++;
-                    if (t == TileType.HOLE) holes.add(idx);
+                    if (t == TileType.HOLE && !filledHole) holes.add(idx);
+                    if (t == TileType.PORTAL) {
+                        portalCells.computeIfAbsent(c, k -> new ArrayList<>()).add(idx);
+                        portalFirstLine.putIfAbsent(c, ln);
+                    }
                     if (block) blocks.add(idx);
                     if (pl) {
                         if (player >= 0) {
@@ -167,6 +184,12 @@ public final class LevelParser {
         }
         if (player < 0) throw new LevelFormatException(source, 0, "플레이어('@' 또는 '+')가 없다.");
         if (goalCount == 0) throw new LevelFormatException(source, 0, "목표 지점('.')이 없다.");
+        for (Map.Entry<Character, List<Integer>> e : portalCells.entrySet()) {
+            if (e.getValue().size() != 2) {
+                throw new LevelFormatException(source, portalFirstLine.get(e.getKey()),
+                        "포탈 '" + e.getKey() + "'는 정확히 두 칸이어야 한다 (현재 " + e.getValue().size() + "칸).");
+            }
+        }
         if (blocks.size() < goalCount + holes.size()) {
             throw new LevelFormatException(source, 0, "블록 수(" + blocks.size() + ")가 목표 수(" + goalCount
                     + ") + 구멍 수(" + holes.size() + ")보다 적어 풀 수 없다.");
@@ -181,7 +204,33 @@ public final class LevelParser {
         for (int hIdx : hs) {
             if (bs.contains(hIdx)) throw new LevelFormatException(source, 0, "구멍 위에 블록이 놓여 있다.");
         }
-        return new Level(id, name, w, d, h, tiles, init, opt, solution, s3, s2, Map.of(), source);
+
+        int[] partner = null;
+        char[] portalChar = null;
+        if (!portalCells.isEmpty()) {
+            partner = new int[tiles.length];
+            portalChar = new char[tiles.length];
+            java.util.Arrays.fill(partner, -1);
+            for (Map.Entry<Character, List<Integer>> e : portalCells.entrySet()) {
+                int first = e.getValue().get(0), second = e.getValue().get(1);
+                partner[first] = second;
+                partner[second] = first;
+                portalChar[first] = e.getKey();
+                portalChar[second] = e.getKey();
+            }
+        }
+        return new Level(id, name, w, d, h, tiles, init, opt, solution, s3, s2, Map.of(), source,
+                pull, partner, portalChar);
+    }
+
+    private static boolean boolMeta(String source, Map<String, String> meta, Map<String, Integer> metaLine,
+                                    String key, boolean def) throws LevelFormatException {
+        String v = meta.get(key);
+        if (v == null) return def;
+        if (v.equalsIgnoreCase("true")) return true;
+        if (v.equalsIgnoreCase("false")) return false;
+        throw new LevelFormatException(source, metaLine.get(key),
+                "'" + key + "'는 true 또는 false여야 한다: '" + v + "'");
     }
 
     private static int intMeta(String source, Map<String, String> meta, Map<String, Integer> metaLine,
