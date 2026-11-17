@@ -78,10 +78,13 @@ public final class AllTests {
         test("저장: 파일 왕복", AllTests::saveRoundTrip);
         test("저장: 손상 파일은 초기 상태", AllTests::saveCorrupt);
         test("카메라: 기본 시점 입력 매핑", sokoban.ui.CameraTest::defaultViewIsIdentity);
-        test("카메라: 모든 회전·기울기에서 키 4개가 서로 다른 방향", sokoban.ui.CameraTest::mappingIsBijectionForEveryQuarterTurnAndPitch);
+        test("카메라: 8방향(45°) 시점 전부에서 키 4개가 서로 다른 방향", sokoban.ui.CameraTest::mappingIsBijectionForEveryEighthTurn);
+        test("카메라: 모든 각도에서 키 4개가 서로 다른 방향", sokoban.ui.CameraTest::mappingIsBijectionAtEveryAngle);
         test("카메라: 90° 회전 시 입력이 화면 기준으로 회전", sokoban.ui.CameraTest::quarterTurnRotatesMapping);
+        test("카메라: 45° 반 걸음 시점은 격자 축이 화면 축과 나란", sokoban.ui.CameraTest::eighthTurnMappingFollowsScreen);
+        test("카메라: 45° 시점에서도 키와 화면 방향이 한 사분면 안쪽", sokoban.ui.CameraTest::eighthTurnMappingStaysWithinOneQuadrant);
         test("카메라: 위/아래 키는 시점과 무관", sokoban.ui.CameraTest::verticalKeysIgnoreCamera);
-        test("카메라: 회전 애니메이션·드래그 정렬·기울기 한계", sokoban.ui.CameraTest::cameraAnimatesAndSnaps);
+        test("카메라: 45° 단위 회전 애니메이션·시점 초기화", sokoban.ui.CameraTest::cameraStepsByEighthTurnAndAnimates);
         test("한글 입력기: 자모 키를 영문 단축키로 보정", sokoban.ui.CameraTest::koreanImeKeysMapToPhysicalKeys);
         test("출고 레벨: 모두 검증 완료·풀이 재생·곡선", AllTests::shippedLevels);
         finish();
