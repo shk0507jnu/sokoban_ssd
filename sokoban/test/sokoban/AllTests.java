@@ -8,6 +8,7 @@ import sokoban.core.Level;
 import sokoban.core.Scoring;
 import sokoban.core.Session;
 import sokoban.core.StepResult;
+import sokoban.core.TileType;
 import sokoban.level.Difficulty;
 import sokoban.level.LevelFormatException;
 import sokoban.level.LevelParser;
@@ -64,6 +65,13 @@ public final class AllTests {
         test("파서: 형식 오류 위치 보고", AllTests::parserErrors);
         test("파서: 블록 수 부족 검증", AllTests::parserBlockCount);
         test("파서: 다층 격자", AllTests::parserLayers);
+        test("파서: 메워진 구멍(=)은 처음부터 평지", AllTests::parserFilledHole);
+        test("파서: 빙판(~) 타일", AllTests::parserIce);
+        test("파서: 포탈 짝 연결(같은 층·다른 층)", AllTests::parserPortalPairs);
+        test("파서: 포탈 짝이 안 맞으면 위치 보고", AllTests::parserPortalErrors);
+        test("파서: pull 메타데이터", AllTests::parserPullMeta);
+        test("레벨: withSolution이 포탈·pull을 보존", AllTests::withSolutionKeepsExtras);
+        test("파서: 레벨 디자이너 에디터 예시 맵(2D)을 그대로 읽음", AllTests::parserDesignerSample);
         test("난이도 점수 D 계산", AllTests::difficultyScore);
         test("설정: 잘못된 값은 기본값 + 경고", AllTests::configFallback);
         test("저장: 신기록만 덮어씀", AllTests::saveOnlyImproves);
@@ -525,6 +533,125 @@ public final class AllTests {
         } catch (LevelFormatException e) {
             throw new AssertionError(e.getMessage());
         }
+    }
+
+    // ---------- 타일 확장 (레벨 디자인: =, ~, A/B, pull) ----------
+
+    static Level parseLines(String... lines) {
+        try {
+            return LevelParser.parse("test", List.of(lines));
+        } catch (LevelFormatException e) {
+            throw new AssertionError(e.getMessage());
+        }
+    }
+
+    static void parserFilledHole() {
+        Level l = lv("######", "#@=$.#", "######");
+        eq(TileType.HOLE, l.tile(at(l, 2, 1)));
+        eq(0, l.holeCount());                       // '='는 남은 구멍이 아니다
+        check(!l.initial.isHole(at(l, 2, 1)));
+        StepResult r = Engine.step(l, l.initial, Direction.RIGHT);
+        notNull(r, "플레이어는 메워진 구멍을 걷는다");
+        eq(at(l, 2, 1), r.state().player);
+
+        // 블록도 메워진 구멍을 지나간다(소멸하지 않는다)
+        Level m = lv("######", "#@$=.#", "######");
+        GameState s = play(m, "R");
+        check(s.hasBlock(at(m, 3, 1)));
+        eq(0, s.holeCount());
+        check(Engine.isCleared(m, play(m, "RR")));
+
+        // 열린 구멍('O')과 섞여 있어도 열린 것만 셌다
+        Level mixed = lv("#######", "#@$O=$.#", "#######");
+        eq(1, mixed.holeCount());
+    }
+
+    static void parserIce() {
+        Level l = lv("######", "#@~$.#", "######");
+        eq(TileType.ICE, l.tile(at(l, 2, 1)));
+        // 플레이어는 빙판을 평범하게 걷는다 (미끄러짐은 상자만, 엔진 PR에서 구현)
+        StepResult r = Engine.step(l, l.initial, Direction.RIGHT);
+        notNull(r);
+        eq(at(l, 2, 1), r.state().player);
+    }
+
+    static void parserPortalPairs() {
+        Level l = lv("##########", "#@$A-A-.#", "##########");
+        int a1 = at(l, 3, 1), a2 = at(l, 5, 1);
+        eq(TileType.PORTAL, l.tile(a1));
+        eq(TileType.PORTAL, l.tile(a2));
+        eq(a2, l.portalPartner(a1));
+        eq(a1, l.portalPartner(a2));
+        eq('A', l.portalId(a1));
+        eq(-1, l.portalPartner(at(l, 1, 1)));       // 포탈이 아닌 칸
+        eq(0, (int) l.portalId(at(l, 1, 1)));
+
+        // 레벨에 포탈이 없으면 모든 칸이 -1/0
+        Level none = lv("#####", "#@$.#", "#####");
+        eq(-1, none.portalPartner(at(none, 1, 1)));
+        eq(0, (int) none.portalId(at(none, 1, 1)));
+
+        // A와 B 두 쌍, 짝이 서로 다른 층에 있어도 된다
+        Level z = lvz("#####/#@AB#/#$.##", "#####/#B--#/#A--#");
+        int a0 = z.idx(2, 1, 0), aUp = z.idx(1, 2, 1);
+        int b0 = z.idx(3, 1, 0), bUp = z.idx(1, 1, 1);
+        eq(aUp, z.portalPartner(a0));
+        eq(a0, z.portalPartner(aUp));
+        eq(bUp, z.portalPartner(b0));
+        eq(b0, z.portalPartner(bUp));
+        eq('A', z.portalId(a0));
+        eq('B', z.portalId(bUp));
+    }
+
+    static void parserPortalErrors() {
+        // 한 칸뿐인 포탈: 그 칸이 있는 줄을 보고한
+        expectError("포탈 'A'", 3, "id: A", "layer 0", "#@$A.#");
+        // 세 칸: 현재 칸 수를 함께 보고
+        expectError("현재 3칸", 3, "id: A", "layer 0", "#@$AAA.#");
+        // A는 짝이 맞고 B만 한 칸: B를 탓한다
+        expectError("포탈 'B'", 4, "id: A", "layer 0", "#@$A.A#", "#B###");
+    }
+
+    static void parserPullMeta() {
+        eq(false, (Object) lv("#####", "#@$.#", "#####").pullAllowed);   // 기본값
+        check(parseLines("id: A", "pull: true", "layer 0", "#@$.#").pullAllowed);
+        check(parseLines("id: A", "pull: TRUE", "layer 0", "#@$.#").pullAllowed);
+        check(!parseLines("id: A", "pull: false", "layer 0", "#@$.#").pullAllowed);
+        expectError("pull", 2, "id: A", "pull: maybe", "layer 0", "#@$.#");
+        expectError("중복", 3, "id: A", "pull: true", "pull: false", "layer 0", "#@$.#");
+    }
+
+    static void withSolutionKeepsExtras() {
+        Level l = parseLines("id: A", "pull: true", "layer 0", "#@$A.A#")
+                .withSolution(3, "RRR");
+        check(l.pullAllowed);
+        eq(l.idx(5, 0, 0), l.portalPartner(l.idx(3, 0, 0)));
+        eq(l.idx(3, 0, 0), l.portalPartner(l.idx(5, 0, 0)));
+        eq(3, l.optimalMoves);
+    }
+
+    /** 레벨 디자이너 문서의 에디터 변환 예시 맵이 그대로 읽히는지 (2D 맵 = layer 0 한 층). */
+    static void parserDesignerSample() {
+        Level l = lv(
+                "###########",
+                "###-$######",
+                "###--######",
+                "#@---~O~.-#",
+                "###--######",
+                "####$######",
+                "###########");
+        eq(11, l.w);
+        eq(7, l.d);
+        eq(1, l.h);
+        eq(1, l.usedLayers());
+        eq(at(l, 1, 3), l.initial.player);
+        eq(2, l.blockCount());
+        eq(1, l.holeCount());
+        eq(1, l.goals.length);
+        eq(TileType.ICE, l.tile(at(l, 5, 3)));
+        eq(TileType.HOLE, l.tile(at(l, 6, 3)));
+        eq(TileType.ICE, l.tile(at(l, 7, 3)));
+        eq(TileType.GOAL, l.tile(at(l, 8, 3)));
     }
 
     static void configFallback() throws IOException {

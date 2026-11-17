@@ -20,10 +20,38 @@ public final class Level {
     /** 사용된 기믹별 인스턴스 수. 기본 게임에는 기믹이 없어 비어 있다. */
     public final Map<String, Integer> gimmicks;
     public final String source;
+    /** 상자 당기기 허용 여부(레벨 메타데이터 {@code pull}, 레벨 디자인 M-02). 기본은 false. */
+    public final boolean pullAllowed;
+    /** 포탈 칸 → 짝 칸. 포탈이 없으면 null, 포탈이 아닌 칸은 -1. */
+    private final int[] portalPartner;
+    /** 포탈 칸의 식별 문자('A', 'B'). 포탈이 없으면 null, 포탈이 아닌 칸은 0. */
+    private final char[] portalChar;
 
     public Level(String id, String name, int w, int d, int h, TileType[] tiles, GameState initial,
                  int optimalMoves, String solution, Double star3Ratio, Double star2Ratio,
                  Map<String, Integer> gimmicks, String source) {
+        this(id, name, w, d, h, tiles, initial, optimalMoves, solution, star3Ratio, star2Ratio,
+                gimmicks, source, false, null, null);
+    }
+
+    /**
+     * @param pullAllowed   상자 당기기 허용 여부
+     * @param portalPartner 셀 인덱스별 짝 포탈 칸(없으면 -1). 포탈이 없으면 null 가능. 길이는 tiles와 같아야 한다.
+     * @param portalChar    셀 인덱스별 포탈 식별 문자(없으면 0). portalPartner와 함께 주거나 함께 null.
+     */
+    public Level(String id, String name, int w, int d, int h, TileType[] tiles, GameState initial,
+                 int optimalMoves, String solution, Double star3Ratio, Double star2Ratio,
+                 Map<String, Integer> gimmicks, String source,
+                 boolean pullAllowed, int[] portalPartner, char[] portalChar) {
+        if ((portalPartner == null) != (portalChar == null)) {
+            throw new IllegalArgumentException("portalPartner와 portalChar는 함께 주거나 함께 null이어야 한다.");
+        }
+        if (portalPartner != null && (portalPartner.length != tiles.length || portalChar.length != tiles.length)) {
+            throw new IllegalArgumentException("포탈 배열 길이가 셀 수와 다르다.");
+        }
+        this.pullAllowed = pullAllowed;
+        this.portalPartner = portalPartner == null ? null : portalPartner.clone();
+        this.portalChar = portalChar == null ? null : portalChar.clone();
         this.id = id;
         this.name = name;
         this.w = w;
@@ -68,6 +96,16 @@ public final class Level {
         return tiles[idx];
     }
 
+    /** idx가 포탈이면 짝 포탈 칸, 아니면 -1. */
+    public int portalPartner(int idx) {
+        return portalPartner == null ? -1 : portalPartner[idx];
+    }
+
+    /** idx가 포탈이면 식별 문자('A', 'B'), 아니면 0. */
+    public char portalId(int idx) {
+        return portalChar == null ? 0 : portalChar[idx];
+    }
+
     /** idx에서 dir 방향 이웃 칸. 격자 밖이면 -1 (격자 밖은 고체로 취급한다). */
     public int neighbor(int idx, Direction dir) {
         int x = x(idx) + dir.dx;
@@ -100,6 +138,6 @@ public final class Level {
 
     public Level withSolution(int optimalMoves, String solution) {
         return new Level(id, name, w, d, h, tiles, initial, optimalMoves, solution,
-                star3Ratio, star2Ratio, gimmicks, source);
+                star3Ratio, star2Ratio, gimmicks, source, pullAllowed, portalPartner, portalChar);
     }
 }
