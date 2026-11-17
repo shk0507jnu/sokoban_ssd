@@ -117,8 +117,152 @@ public final class CameraTest {
         return (a - b + 540) % 360 - 180;
     }
 
+    public static void topViewProjectsSquareTiles() {
+        // 탑뷰(yaw -45°, pitch 90°): 격자 +x = 화면 오른쪽, +y = 화면 아래, z는 화면에서 사라진다
+        double[] ex = IsoRenderer.project(1, 0, 0, Camera.TOP_YAW, Camera.TOP_PITCH);
+        double[] ey = IsoRenderer.project(0, 1, 0, Camera.TOP_YAW, Camera.TOP_PITCH);
+        double[] ez = IsoRenderer.project(0, 0, 1, Camera.TOP_YAW, Camera.TOP_PITCH);
+        near(ex[0], 1);
+        near(ex[1], 0);
+        near(ey[0], 0);
+        near(ey[1], 1);
+        near(ez[0], 0);
+        near(ez[1], 0);
+        // 두 격자 축이 화면에서 직교하고 길이가 같다 = 반듯한 정사각 타일
+        double dot = ex[0] * ey[0] + ex[1] * ey[1];
+        double lenX = Math.hypot(ex[0], ex[1]), lenY = Math.hypot(ey[0], ey[1]);
+        near(dot, 0);
+        near(lenX, lenY);
+        // 대각선도 45°가 아니라 정사각형의 대각선(1:1)이다
+        double[] diag = IsoRenderer.project(1, 1, 0, Camera.TOP_YAW, Camera.TOP_PITCH);
+        near(diag[0], 1);
+        near(diag[1], 1);
+        // 기본 3D 시점은 반대로 마름모 타일이다: +x 와 +y 가 둘 다 비스듬히 간다
+        double[] isoX = IsoRenderer.project(1, 0, 0, 0, Camera.DEFAULT_PITCH);
+        double[] isoY = IsoRenderer.project(0, 1, 0, 0, Camera.DEFAULT_PITCH);
+        check(Math.abs(isoX[1]) > 0.1 && Math.abs(isoY[1]) > 0.1, "기본 시점은 마름모 타일");
+    }
+
+    /** 탑뷰에서는 W/A/S/D가 화면 위/왼쪽/아래/오른쪽 그대로 움직인다. */
+    public static void topViewKeyMappingFollowsScreen() {
+        for (Direction k : KEYS) {
+            check(Camera.mapKey(k, Camera.TOP_YAW) == k, "탑뷰에서 " + k + " 는 그대로여야 한다");
+            Direction d = Camera.mapKey(k, Camera.TOP_YAW);
+            double[] v = IsoRenderer.project(d.dx, d.dy, 0, Camera.TOP_YAW, Camera.TOP_PITCH);
+            double moved = Math.toDegrees(Math.atan2(v[1], v[0]));
+            check(Math.abs(screenAngleDiff(moved, keyAngleOnScreen(k))) < 0.001,
+                    "탑뷰에서 " + k + " 는 화면 " + keyAngleOnScreen(k) + "° 쪽으로 가야 한다 (실제 " + moved + "°)");
+        }
+    }
+
+    /** 탑뷰·기본 시점은 고정값으로 만들어지며 연출 없이 즉시 적용된다. */
+    public static void topViewPoseConstants() {
+        eq(90.0, Camera.TOP_PITCH);
+        eq(-45.0, Camera.TOP_YAW);
+        eq(30.0, Camera.DEFAULT_PITCH);
+        check(Camera.mapKey(Direction.UP, 360 + Camera.TOP_YAW) == Direction.UP, "탑뷰 각도는 360° 주기");
+        Camera c = new Camera();
+        c.snapToTopView();
+        eq(Camera.TOP_YAW, c.yaw);
+        eq(Camera.TOP_YAW, c.targetYaw);
+        eq(Camera.TOP_PITCH, c.pitch);
+        eq(Camera.TOP_PITCH, c.targetPitch);
+        check(!c.isAnimating(), "탑뷰 고정은 연출 없이 즉시");
+        c.snapToDefaultView();
+        eq(0.0, c.yaw);
+        eq(Camera.DEFAULT_PITCH, c.pitch);
+        check(!c.isAnimating(), "기본 3D 시점도 즉시");
+    }
+
+    /** 첫 3D 레벨 진입 연출: 탑뷰에서 3D 시점으로 부드럽게 기울며 돌아가고 결국 정확히 수렴한다. */
+    public static void expansionFromTopViewAnimatesAndConverges() {
+        Camera c = new Camera();
+        c.expandFromTopView();
+        eq(Camera.TOP_YAW, c.yaw);
+        eq(Camera.TOP_PITCH, c.pitch);
+        eq(0.0, c.targetYaw);
+        eq(Camera.DEFAULT_PITCH, c.targetPitch);
+        check(c.isExpanding() && c.isAnimating(), "연출 시작");
+        check(Camera.EXPAND_MS >= 500, "연출은 눈에 보일 만큼 길어야 한다: " + Camera.EXPAND_MS + "ms");
+
+        // 초반은 천천히: 0.24초쯤에도 아직 탑뷰에 가깝다
+        for (int i = 0; i < 15; i++) c.update(16); // 약 0.24초
+        check(c.pitch < Camera.TOP_PITCH && c.pitch > Camera.DEFAULT_PITCH + 5, "중간 기울기: " + c.pitch);
+        check(c.yaw > Camera.TOP_YAW && c.yaw < 0, "중간 yaw: " + c.yaw);
+
+        // 기울기는 단조 감소한다(도중에 되돌아가지 않는다)
+        double prev = c.pitch;
+        int frames = 15;
+        while (c.isExpanding() && frames < 1000) {
+            c.update(16);
+            frames++;
+            check(c.pitch <= prev + 1e-9, "기울기는 단조 감소");
+            prev = c.pitch;
+        }
+        check(frames > 30, "연출은 한 번에 끝나지 않는다: " + frames + "프레임");
+        check(frames <= Camera.EXPAND_MS / 16 + 2, "연출은 EXPAND_MS 안에 끝난다: " + frames + "프레임");
+        eq(Camera.DEFAULT_PITCH, c.pitch);
+        eq(0.0, c.yaw);
+        check(!c.isAnimating(), "수렴 후 정지");
+
+        // 정확히 절반 지점에서는 정확히 절반만큼(이징 대칭점)
+        Camera d = new Camera();
+        d.expandFromTopView();
+        d.update(Camera.EXPAND_MS / 2);
+        eq((Camera.TOP_PITCH + Camera.DEFAULT_PITCH) / 2, d.pitch);
+        eq(Camera.TOP_YAW / 2, d.yaw);
+        check(d.isExpanding(), "절반 지점은 아직 진행 중");
+        d.update(Camera.EXPAND_MS / 2);
+        check(!d.isExpanding(), "EXPAND_MS 뒤에는 끝난다");
+        eq(Camera.DEFAULT_PITCH, d.pitch);
+
+        // 연출 중 시점 조작을 하면 연출을 끊고 바로 3D에서 돈다
+        Camera e = new Camera();
+        e.expandFromTopView();
+        e.update(100);
+        e.rotateStep(1);
+        check(!e.isExpanding(), "시점 조작은 연출을 끊는다");
+        eq(Camera.DEFAULT_PITCH, e.pitch);
+        eq(45.0, e.targetYaw);
+    }
+
+    /** 시점 초기화(V)는 회전과 기울기를 모두 기본 3D 시점으로 되돌린다. */
+    public static void resetViewRestoresDefaultTilt() {
+        Camera c = new Camera();
+        c.snapToTopView();
+        c.resetView();
+        for (int i = 0; i < 300; i++) c.update(16);
+        eq(Camera.DEFAULT_PITCH, c.pitch);
+        eq(0.0, c.yaw);
+        check(!c.isAnimating(), "초기화 후 정지");
+        // 3D에서 돌린 뒤에도 기울기는 그대로 30°
+        Camera d = new Camera();
+        d.rotateStep(2);
+        for (int i = 0; i < 200; i++) d.update(16);
+        eq(Camera.DEFAULT_PITCH, d.pitch);
+        eq(90.0, d.yaw);
+    }
+
+    /** 키가 가리키는 화면 방향(탑뷰). 화면 오른쪽=0°, 아래=+90°. */
+    private static double keyAngleOnScreen(Direction k) {
+        return switch (k) {
+            case UP -> -90;
+            case RIGHT -> 0;
+            case DOWN -> 90;
+            default -> 180;
+        };
+    }
+
+    private static void near(double a, double b) {
+        if (Math.abs(a - b) > 1e-9) throw new AssertionError("값이 다르다: " + a + " vs " + b);
+    }
+
+    private static void eq(double a, double b) {
+        if (a != b) throw new AssertionError("값이 다르다: " + a + " vs " + b);
+    }
+
     public static void verticalKeysIgnoreCamera() {
-        for (double yaw : new double[]{0, 45, 135, 225, 315}) {
+        for (double yaw : new double[]{0, 45, 135, 225, 315, -45}) {
             check(Camera.mapKey(Direction.ABOVE, yaw) == Direction.ABOVE, "위 키 yaw " + yaw);
             check(Camera.mapKey(Direction.BELOW, yaw) == Direction.BELOW, "아래 키 yaw " + yaw);
         }

@@ -22,6 +22,7 @@ import java.util.List;
  *
  * <p>카메라: 격자 중심을 축으로 z축 회전(yaw)과 기울기(pitch)를 준다. yaw 0, pitch 30°는
  * x+ = 화면 오른쪽 아래, y+ = 화면 왼쪽 아래, z+ = 위인 기본 시점이다.
+ * yaw -45°, pitch 90° 는 2D 탑뷰로, z축이 화면에서 사라지고 격자가 화면 축과 나란한 정사각 타일로 그려진다.
  * 물체는 카메라 방향 깊이 순으로 정렬해 그리고(화가 알고리즘), 입체의 각 면은 법선으로 뒷면을 거른다.
  *
  * <p>공중에 떠 있는 물체의 높이를 읽을 수 있도록 바닥 격자(z=0), 뒤쪽 모서리 틀, 바닥 그림자,
@@ -55,10 +56,28 @@ final class IsoRenderer {
     }
 
     private double[] pt(double x, double y, double z) {
-        double dx = x - cx0, dy = y - cy0, dz = z - cz0;
+        double[] p = projectWith(cosPsi, sinPsi, cosP, sinP, x - cx0, y - cy0, z - cz0);
+        return new double[]{ox + p[0] * S * scale, oy + p[1] * S * scale};
+    }
+
+    /**
+     * 월드 오프셋(dx, dy, dz)을 화면 평면 좌표(단위: 칸)로 투영한다. {@link #pt}와 같은 식이며,
+     * 시점 하나의 기하를 테스트에서 그대로 확인할 수 있도록 열어 둔다.
+     *
+     * <p>yaw -45°(psi 0°)·pitch 90° 이면 (dx, dy, 0) → (dx, dy) 가 되어 격자 축이 화면 축과
+     * 나란한 정사각 타일이 된다. 이것이 2D 탑뷰다.
+     */
+    static double[] project(double dx, double dy, double dz, double yawDeg, double pitchDeg) {
+        double psi = Math.toRadians(45 + yawDeg);
+        double p = Math.toRadians(pitchDeg);
+        return projectWith(Math.cos(psi), Math.sin(psi), Math.cos(p), Math.sin(p), dx, dy, dz);
+    }
+
+    private static double[] projectWith(double cosPsi, double sinPsi, double cosP, double sinP,
+                                       double dx, double dy, double dz) {
         double x1 = dx * cosPsi - dy * sinPsi;
         double y1 = dx * sinPsi + dy * cosPsi;
-        return new double[]{ox + x1 * S * scale, oy + (y1 * sinP - dz * cosP) * S * scale};
+        return new double[]{x1, y1 * sinP - dz * cosP};
     }
 
     /** 클수록 시점에 가깝다. */

@@ -1,24 +1,24 @@
 id: L07
-name: 첫 구멍
-optimalMoves: 8
-solution: TDDLTLBB
+name: 모서리 돌기
+optimalMoves: 7
+solution: LDDTDBB
 layer 0
+---
+---
 #--
----
-.-#
----
+-.-
 layer 1
---@
+---
 --#
 ---
 ---
 layer 2
----
---$
+--@
 -$-
-#--
-layer 3
---O
 ---
+---
+layer 3
+---
+-#-
 ---
 ---

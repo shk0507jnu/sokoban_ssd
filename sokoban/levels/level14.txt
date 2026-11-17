@@ -1,24 +1,24 @@
 id: L14
-name: 다락과 지하
-optimalMoves: 22
-solution: LUUTTULDTRRURDLLBBBLTT
+name: 깊은 구멍
+optimalMoves: 21
+solution: TTRDDUUTDDLDRRLBBLBRR
 layer 0
-----
----#
+@--#
 --#-
---@#
+----
+---.
 layer 1
--#-#
-$$--
----$
----#
+$O--
+----
+----
+----
 layer 2
 ----
-$---
-.---
-O---
+-$--
+----
+----
 layer 3
 ----
-.---
+-$-#
+----
 ---.
---#-

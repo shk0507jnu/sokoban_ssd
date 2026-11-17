@@ -1,12 +1,10 @@
 id: L02
-name: 위로
-optimalMoves: 2
-solution: TT
+name: 꺾어 밀기
+optimalMoves: 5
+solution: RRDRU
 layer 0
-@
-layer 1
-$
-layer 2
--
-layer 3
-.
+######
+#---.#
+#@$--#
+#----#
+######

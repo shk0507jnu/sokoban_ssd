@@ -85,7 +85,13 @@ public final class AllTests {
         test("카메라: 45° 시점에서도 키와 화면 방향이 한 사분면 안쪽", sokoban.ui.CameraTest::eighthTurnMappingStaysWithinOneQuadrant);
         test("카메라: 위/아래 키는 시점과 무관", sokoban.ui.CameraTest::verticalKeysIgnoreCamera);
         test("카메라: 45° 단위 회전 애니메이션·시점 초기화", sokoban.ui.CameraTest::cameraStepsByEighthTurnAndAnimates);
+        test("카메라: 탑뷰는 격자가 정사각 타일로 투영", sokoban.ui.CameraTest::topViewProjectsSquareTiles);
+        test("카메라: 탑뷰에서 W/A/S/D가 화면 방향 그대로", sokoban.ui.CameraTest::topViewKeyMappingFollowsScreen);
+        test("카메라: 탑뷰·기본 시점 자세 고정값", sokoban.ui.CameraTest::topViewPoseConstants);
+        test("카메라: 탑뷰→3D 확장 연출 수렴", sokoban.ui.CameraTest::expansionFromTopViewAnimatesAndConverges);
+        test("카메라: 시점 초기화가 기울기까지 되돌림", sokoban.ui.CameraTest::resetViewRestoresDefaultTilt);
         test("한글 입력기: 자모 키를 영문 단축키로 보정", sokoban.ui.CameraTest::koreanImeKeysMapToPhysicalKeys);
+        test("출고 레벨: 1~3단계는 2D, 4단계부터 3D", AllTests::shippedLevelStructure);
         test("출고 레벨: 모두 검증 완료·풀이 재생·곡선", AllTests::shippedLevels);
         finish();
     }
@@ -714,6 +720,31 @@ public final class AllTests {
         Files.write(f, new byte[]{(byte) 0xff, (byte) 0xfe, 0, 1, 2});
         SaveStore s2 = new SaveStore(f);
         check(!s2.cleared("B"));
+    }
+
+    /** 1~3단계는 2D(한 층) 탑뷰 레벨이고, 4단계부터 3D(여러 층) 레벨이다. 탑뷰→3D 확장 연출은 4단계에서 처음 나온다. */
+    static void shippedLevelStructure() {
+        GameConfig cfg = GameConfig.load(Path.of("config", "game.properties"));
+        LevelRepository repo = LevelRepository.load(Path.of("levels"), cfg);
+        check(repo.errors.isEmpty(), "레벨 오류: " + repo.errors);
+        eq(18, repo.levels.size(), "출고 레벨 수");
+        int first3D = -1;
+        for (int i = 0; i < repo.levels.size(); i++) {
+            Level l = repo.levels.get(i);
+            eq(String.format("L%02d", i + 1), l.id, (i + 1) + "번째 레벨 id");
+            if (i < 3) {
+                eq(1, l.h, l.id + " 는 한 층(2D)이어야 한다");
+                eq(1, l.usedLayers(), l.id + " 사용 층 수");
+            } else {
+                check(l.h > 1, l.id + " 는 여러 층(3D)이어야 한다");
+                if (first3D < 0) first3D = i;
+            }
+            if (i > 0) {
+                check(Difficulty.score(l, cfg) >= Difficulty.score(repo.levels.get(i - 1), cfg),
+                        l.id + " 난이도 순서 (D 비감소)");
+            }
+        }
+        eq(3, first3D, "첫 3D 레벨은 4단계");
     }
 
     static void shippedLevels() {

@@ -1,12 +1,10 @@
 id: L03
-name: 아래로
-optimalMoves: 2
-solution: BB
+name: 두 개의 짐
+optimalMoves: 4
+solution: RLDR
 layer 0
-.
-layer 1
--
-layer 2
-$
-layer 3
-@
+######
+#@$.-#
+#-$.-#
+#----#
+######

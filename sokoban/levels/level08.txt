@@ -1,24 +1,24 @@
 id: L08
-name: 둘씩 둘
-optimalMoves: 13
-solution: URBLBLTUTDDBB
+name: 기둥 옆
+optimalMoves: 10
+solution: DLULDDBDTT
 layer 0
 ---
--#-
-.--
+---
+--#
 ---
 layer 1
+--@
+-$-
 ---
----
--#-
 ---
 layer 2
 ---
--$-
-$--
--#-
+---
+---
+---
 layer 3
+---
 -#-
 ---
--@-
-.--
+.#-

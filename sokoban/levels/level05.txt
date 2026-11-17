@@ -1,24 +1,12 @@
 id: L05
-name: 모서리 돌기
-optimalMoves: 7
-solution: LDDTDBB
+name: 아래로
+optimalMoves: 2
+solution: BB
 layer 0
----
----
-#--
--.-
+.
 layer 1
----
---#
----
----
+-
 layer 2
---@
--$-
----
----
+$
 layer 3
----
--#-
----
----
+@
