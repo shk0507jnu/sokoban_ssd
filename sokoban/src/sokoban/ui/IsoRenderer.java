@@ -141,6 +141,12 @@ final class IsoRenderer {
                         items.add(new Item(key, 0, () -> cube(g, x, y, z, Theme.GOAL, 0.22f)));
                     }
                 }
+                // 새 타일: 행동은 엔진 PR에서 구현하고, 여기서는 어느 칸인지 알아볼 수 있게 투명 색 상자만 그린다
+                case ICE -> items.add(new Item(key, 0, () -> cube(g, x, y, z, Theme.ICE, 0.50f)));
+                case PORTAL -> {
+                    final Color pc = lv.portalId(idx) == 'B' ? Theme.PORTAL_B : Theme.PORTAL_A;
+                    items.add(new Item(key, 0, () -> cube(g, x, y, z, pc, 0.60f)));
+                }
                 default -> {
                 }
             }

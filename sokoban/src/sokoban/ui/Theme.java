@@ -27,6 +27,10 @@ final class Theme {
     static final Color BLOCK_ON_GOAL = new Color(0x5fd08a);
     static final Color GOAL = new Color(0xffd45a);
     static final Color HOLE = new Color(0x2a1f3d);
+    // 새 타일 색: 블록(주황)·플레이어(청록)·목표(노랑)와 겹치지 않게 잡았다
+    static final Color ICE = new Color(0xe3f4ff);
+    static final Color PORTAL_A = new Color(0x8f6bff);
+    static final Color PORTAL_B = new Color(0xff5fa8);
     static final Color PLAYER = new Color(0x52e0ff);
 
     private static final String FAMILY = pickFamily();
