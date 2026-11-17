@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>860</w>
+<h>630</h>
+</coordinates>
+<panel_attributes>title=sd UC-13 Basic Course - 일시정지 및 메뉴 조작
+desc=Esc 로 일시정지 메뉴(계속, 다시 시작, 레벨 선택, 메인 메뉴)를 열고 항목을 고른다.\nAlternate: i == 0 계속 - mode = PLAYING / i == 1 다시 시작 - SD-07
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;UI&gt;&gt;\n_:MenuList (pauseMenu)_~ml
+obj=&lt;&lt;controller&gt;&gt;\n_:App_~app
+
+u-&gt;&gt;&gt;ps : 1: Esc 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ps + : 2: finishAnim(), mode = PAUSED
+tick=
+u-&gt;&gt;&gt;ps : 3: 방향키 / Enter 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ml : 4: i = key(e)
+ps-&gt;&gt;&gt;ps + : 5: pauseAction(i)
+tick=
+ps-&gt;&gt;&gt;app : 6: [i == 2] showLevelSelect(levelIndex)
+ps-&gt;&gt;&gt;app : 7: [i == 3] showMainMenu()</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

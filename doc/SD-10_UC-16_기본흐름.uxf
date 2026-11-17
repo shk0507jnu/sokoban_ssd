@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>849</w>
+<h>478</h>
+</coordinates>
+<panel_attributes>title=sd UC-16 Basic Course - 층 보기 전환
+desc=Tab 으로 현재 층을 강조(위층을 흐리게)하거나 일반 보기로 복귀한다.
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;UI&gt;&gt;\n_:IsoRenderer_~ir
+
+u-&gt;&gt;&gt;ps : 1: Tab 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ps + : 2: layerFocus = !layerFocus
+tick=
+ps-&gt;&gt;&gt;ir : 3: render(g, level, state, anim, area, cam, layerFocus)
+ir-&gt;&gt;&gt;ir + : 4: [layerFocus] layerZ = z(player) + 0.5 (위층을 흐리게)
+tick=</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

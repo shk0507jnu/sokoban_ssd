@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>483</w>
+<h>106</h>
+</coordinates>
+<panel_attributes>&lt;&lt;exception&gt;&gt;
+*LevelFormatException*
+--
++source: String
++line: int
+--
++LevelFormatException(source: String, line: int, message: String)
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>633</x>
+<y>0</y>
+<w>378</w>
+<h>96</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*LevelParser*
+--
+_+parse(source: String, lines: List&lt;String&gt;): Level_
+_-intMeta(source, meta, metaLine, key, min): int_
+_-ratioMeta(source, meta, metaLine, key): Double_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>1161</x>
+<y>0</y>
+<w>126</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>&lt;&lt;entity&gt;&gt;
+*Level*
+(sokoban.core)
+layer=1
+bg=#EEEEEE</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>633</x>
+<y>206</y>
+<w>378</w>
+<h>138</h>
+</coordinates>
+<panel_attributes>&lt;&lt;persistence&gt;&gt;
+*LevelRepository*
+--
++levels: List&lt;Level&gt;
++difficulty: List&lt;Double&gt;
++errors: List&lt;String&gt;
+--
+-LevelRepository(levels, difficulty, errors)
+_+load(dir: Path, cfg: GameConfig): LevelRepository_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>633</x>
+<y>454</y>
+<w>322</w>
+<h>64</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Difficulty*
+--
+_+score(lv: Level, cfg: GameConfig): double_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>206</y>
+<w>378</w>
+<h>330</h>
+</coordinates>
+<panel_attributes>&lt;&lt;config&gt;&gt;
+*GameConfig*
+--
++kappa: int
++star3Ratio: double
++star2Ratio: double
++alpha: double
++beta: double
++gamma: double
++delta: double
++maxDeltaD: double
++gimmickWeights: Map&lt;String, Double&gt;
++maxChain: int
++warnings: List&lt;String&gt;
+--
+-GameConfig(p: Properties, warnings: List&lt;String&gt;)
+_+defaults(): GameConfig_
+_+load(file: Path): GameConfig_
++weightOf(gimmick: String): double
+-intOf(p, key, def, min, max): int
+-doubleOf(p, key, def, min, max): double
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>463</x>
+<y>28</y>
+<w>190</w>
+<h>45</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;throws&gt;&gt;</panel_attributes>
+<additional_attributes>170;20;95;20;95;25;20;25</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>991</x>
+<y>7</y>
+<w>190</w>
+<h>61</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;create&gt;&gt;</panel_attributes>
+<additional_attributes>20;41;95;41;95;20;170;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>802</x>
+<y>76</y>
+<w>40</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;130;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>774</x>
+<y>324</y>
+<w>68</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>48;20;48;75;20;75;20;130</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>991</x>
+<y>34</y>
+<w>228</w>
+<h>261</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=0..*
+levels</panel_attributes>
+<additional_attributes>20;241;208;241;208;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>358</x>
+<y>466</y>
+<w>295</w>
+<h>40</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>275;20;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>935</x>
+<y>34</y>
+<w>340</w>
+<h>472</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;452;320;452;320;20</additional_attributes>
+</element>
+<element>
+<id>UMLNote</id>
+<coordinates>
+<x>1035</x>
+<y>558</y>
+<w>420</w>
+<h>94</h>
+</coordinates>
+<panel_attributes>CD-03 level · config
+회색 상자 = 다른 패키지 클래스
+LevelRepository.load 는 오류 레벨을 목록에서
+제외하고 errors 에 모은다 (UC-01 1a)
+GameConfig 는 값이 틀리면 기본값 + warnings (UC-19)
+bg=#FFFFE0</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

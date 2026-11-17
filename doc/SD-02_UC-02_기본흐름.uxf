@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>1460</w>
+<h>770</h>
+</coordinates>
+<panel_attributes>title=sd UC-02 Basic Course - 레벨 선택
+desc=메인 메뉴에서 "시작"을 고르면 레벨 목록이 뜨고, 해금된 레벨을 고르면 플레이 화면이 열린다.\nAlternate: 2a 잠긴 레벨 선택 - isUnlocked(i) == false 이면 안내 문구(status)만 표시하고 진입하지 않는다
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:MainMenuScreen_~mm
+obj=&lt;&lt;controller&gt;&gt;\n_:App_~app
+obj=&lt;&lt;persistence&gt;&gt;\n_:SaveStore_~ss
+obj=&lt;&lt;UI&gt;&gt;\n_:LevelSelectScreen_~ls CREATED_LATER
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps CREATED_LATER
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se CREATED_LATER
+
+u-&gt;&gt;&gt;mm : 1: "시작" 선택 (Enter / 클릭)
+mm-&gt;&gt;&gt;app : 2: focus = firstOpenLevel()
+app-&gt;&gt;&gt;ss : 3: cleared(levelId)
+mm-&gt;&gt;&gt;app : 4: showLevelSelect(focus)
+app-&gt;&gt;&gt;ls : 5: &lt;&lt;create&gt;&gt; LevelSelectScreen(app, focus)
+u-&gt;&gt;&gt;ls : 6: 해금된 레벨 선택 (Enter / 클릭)
+ls-&gt;&gt;&gt;app : 7: ok = isUnlocked(i)
+app-&gt;&gt;&gt;ss : 8: cleared(prevLevelId)
+ls-&gt;&gt;&gt;app : 9: [ok] startLevel(i)
+app-&gt;&gt;&gt;ps : 10: &lt;&lt;create&gt;&gt; PlayScreen(app, i)
+ps-&gt;&gt;&gt;se : 11: &lt;&lt;create&gt;&gt; Session(level, config)</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

@@ -1,0 +1,24 @@
+id: L05
+name: 모서리 돌기
+optimalMoves: 7
+solution: LDDTDBB
+layer 0
+---
+---
+#--
+-.-
+layer 1
+---
+--#
+---
+---
+layer 2
+--@
+-$-
+---
+---
+layer 3
+---
+-#-
+---
+---

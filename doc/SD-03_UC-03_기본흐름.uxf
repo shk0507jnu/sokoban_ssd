@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>1460</w>
+<h>744</h>
+</coordinates>
+<panel_attributes>title=sd UC-03 Basic Course - 평면 이동 (3D 6방향 이동)
+desc=플레이어가 방향키로 빈 칸으로 움직인다.\nAlternate: 3a 목적지에 블록 - SD-04 / 3d 벽·구멍·격자 밖 - step() 이 null, 상태와 이동 횟수 불변
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;UI&gt;&gt;\n_:Camera_~cam
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+obj=&lt;&lt;utility&gt;&gt;\nEngine~en
+obj=&lt;&lt;entity&gt;&gt;\n_:Level_~lv
+obj=&lt;&lt;entity&gt;&gt;\n_:GameState_~gs
+
+u-&gt;&gt;&gt;ps : 1: 방향키 입력: keyPressed(e)
+ps-&gt;&gt;&gt;cam : 2: d = mapKey(key)
+ps-&gt;&gt;&gt;se : 3: r = move(d)
+se-&gt;&gt;&gt;en : 4: r = step(level, state, d)
+en-&gt;&gt;&gt;lv : 5: to = neighbor(from, dir)
+en-&gt;&gt;&gt;gs : 6: [목적지가 빈 칸] next = withPlayer(to)
+en-&gt;&gt;&gt;en + : 7: isCleared(lv, next)
+tick=
+se-&gt;&gt;&gt;se + : 8: undoStack.push(state), state = r.state()
+tick=
+ps-&gt;&gt;&gt;ps + : 9: animStep = r (이동 애니메이션)
+tick=</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLNote</id>
+<coordinates>
+<x>0</x>
+<y>754</y>
+<w>1460</w>
+<h>38</h>
+</coordinates>
+<panel_attributes>UC-03 의 "낙하(UC-09)" 단계는 중력이 없는 3D 규칙이라 구현하지 않았다.
+bg=#FFFFE0</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

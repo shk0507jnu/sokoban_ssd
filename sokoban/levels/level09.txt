@@ -1,0 +1,24 @@
+id: L09
+name: 우물
+optimalMoves: 14
+solution: UURBBDDLDRBRTT
+layer 0
+---
+--O
+---
+---
+layer 1
+---
+#$-
+---
+---
+layer 2
+-$-
+---
+---
+#--
+layer 3
+---
+---
+@--
+--.

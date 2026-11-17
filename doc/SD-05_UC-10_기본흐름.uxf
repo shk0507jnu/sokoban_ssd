@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>660</w>
+<h>538</h>
+</coordinates>
+<panel_attributes>title=sd UC-10 Basic Course - 되돌리기
+desc=직전 입력 이전 상태로 돌아가고, 이동 횟수 -1, 되돌리기 횟수 +1.\nAlternate: 1a 기록이 없거나 클리어 후 - undo() 가 false, 변화 없음
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+
+u-&gt;&gt;&gt;ps : 1: Z 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ps + : 2: finishAnim()
+tick=
+ps-&gt;&gt;&gt;se : 3: ok = undo()
+se-&gt;&gt;&gt;se + : 4: redoStack.push(state), state = undoStack.pop(), undoCount++
+tick=
+ps-&gt;&gt;&gt;se : 5: HUD 갱신: moves(), undoCount()</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

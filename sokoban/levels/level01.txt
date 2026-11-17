@@ -1,0 +1,6 @@
+id: L01
+name: 한 방향
+optimalMoves: 2
+solution: RR
+layer 0
+@$-.

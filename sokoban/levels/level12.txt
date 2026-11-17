@@ -1,0 +1,24 @@
+id: L12
+name: 깊은 구멍
+optimalMoves: 21
+solution: TTRDDUUTDDLDRRLBBLBRR
+layer 0
+@--#
+--#-
+----
+---.
+layer 1
+$O--
+----
+----
+----
+layer 2
+----
+-$--
+----
+----
+layer 3
+----
+-$-#
+----
+---.

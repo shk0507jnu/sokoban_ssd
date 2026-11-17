@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>133</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*LevelParser*
+(sokoban.level)
+layer=1
+bg=#EEEEEE</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>193</x>
+<y>0</y>
+<w>133</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Difficulty*
+(sokoban.level)
+layer=1
+bg=#EEEEEE</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>386</x>
+<y>0</y>
+<w>140</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>&lt;&lt;config&gt;&gt;
+*GameConfig*
+(sokoban.config)
+layer=1
+bg=#EEEEEE</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>4</x>
+<y>174</y>
+<w>511</w>
+<h>80</h>
+</coordinates>
+<panel_attributes>&lt;&lt;tool&gt;&gt;
+*LevelTool*
+--
+_+main(args: String[])_
+_~rewrite(lines: List&lt;String&gt;, moves: int, path: String): List&lt;String&gt;_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>4</x>
+<y>364</y>
+<w>476</w>
+<h>80</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Solver*
+--
+_+solve(lv: Level, maxStates: int, timeLimitMillis: long): Result_
+_-pathOf(n: Node): String_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>908</x>
+<y>364</y>
+<w>133</w>
+<h>96</h>
+</coordinates>
+<panel_attributes>&lt;&lt;enumeration&gt;&gt;
+*Solver.Status*
+--
+SOLVED
+UNSOLVABLE
+LIMIT_EXCEEDED
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>610</x>
+<y>364</y>
+<w>168</w>
+<h>128</h>
+</coordinates>
+<panel_attributes>&lt;&lt;record&gt;&gt;
+*Solver.Result*
+--
++status: Status
++moves: int
++path: String
++statesExplored: int
++millis: long
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>250</x>
+<y>554</y>
+<w>147</w>
+<h>112</h>
+</coordinates>
+<panel_attributes>&lt;&lt;private&gt;&gt;
+*Solver.Node*
+--
+~state: GameState
+~parent: Node
+~dir: Direction
+~depth: int
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>4</x>
+<y>554</y>
+<w>126</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Engine*
+(sokoban.core)
+layer=1
+bg=#EEEEEE</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>776</y>
+<w>511</w>
+<h>234</h>
+</coordinates>
+<panel_attributes>&lt;&lt;persistence&gt;&gt;
+*SaveStore*
+--
+-file: Path
+-records: Map&lt;String, Record&gt;
+-loadWarning: String
+--
++SaveStore(file: Path)
+_+defaultFile(): Path_
++loadWarning(): String
++get(levelId: String): Record
++cleared(levelId: String): boolean
++update(levelId: String, score: int, stars: int, moves: int): boolean
++save() throws IOException
+-load()
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>641</x>
+<y>776</y>
+<w>140</w>
+<h>96</h>
+</coordinates>
+<panel_attributes>&lt;&lt;record&gt;&gt;
+*SaveStore.Record*
+--
++bestScore: int
++bestStars: int
++bestMoves: int
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>48</x>
+<y>34</y>
+<w>40</w>
+<h>160</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;140;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>240</x>
+<y>34</y>
+<w>40</w>
+<h>160</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;140;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>430</x>
+<y>34</y>
+<w>40</w>
+<h>160</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;140;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>222</x>
+<y>234</y>
+<w>58</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>38;20;38;75;20;75;20;130</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>460</x>
+<y>368</y>
+<w>170</w>
+<h>54</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;create&gt;&gt;</panel_attributes>
+<additional_attributes>20;20;85;20;85;34;150;34</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>758</x>
+<y>373</y>
+<w>170</w>
+<h>50</h>
+</coordinates>
+<panel_attributes>lt=-&gt;
+m2=1
+status</panel_attributes>
+<additional_attributes>20;30;85;30;85;20;150;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>304</x>
+<y>424</y>
+<w>125</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=0..*
+탐색 큐</panel_attributes>
+<additional_attributes>105;20;105;75;20;75;20;130</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>9</x>
+<y>424</y>
+<w>110</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>90;20;90;75;20;75;20;130</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>491</x>
+<y>785</y>
+<w>170</w>
+<h>81</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=0..*
+records</panel_attributes>
+<additional_attributes>20;61;85;61;85;20;150;20</additional_attributes>
+</element>
+<element>
+<id>UMLNote</id>
+<coordinates>
+<x>908</x>
+<y>776</y>
+<w>400</w>
+<h>78</h>
+</coordinates>
+<panel_attributes>CD-04 solver · tool · save
+Solver 는 Engine 을 그대로 재사용한다
+(BFS, 처음 찾은 해 = 최적해)
+SaveStore 는 ui 패키지(App, PlayScreen)가 사용
+bg=#FFFFE0</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

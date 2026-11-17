@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>1460</w>
+<h>974</h>
+</coordinates>
+<panel_attributes>title=sd UC-04 Basic Course - 블록 밀기
+desc=플레이어가 블록 쪽으로 입력하면 블록과 플레이어가 한 칸씩 움직인다. 구멍이면 블록과 구멍이 함께 사라진다.\nAlternate: 2a 뒤 칸이 벽·블록·격자 밖 - step() 이 null, 상태와 이동 횟수 불변
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;UI&gt;&gt;\n_:Camera_~cam
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+obj=&lt;&lt;utility&gt;&gt;\nEngine~en
+obj=&lt;&lt;entity&gt;&gt;\n_:Level_~lv
+obj=&lt;&lt;entity&gt;&gt;\n_:GameState_~gs
+
+u-&gt;&gt;&gt;ps : 1: 블록 방향 입력: keyPressed(e)
+ps-&gt;&gt;&gt;cam : 2: d = mapKey(key)
+ps-&gt;&gt;&gt;se : 3: r = move(d)
+se-&gt;&gt;&gt;en : 4: r = step(level, state, d)
+en-&gt;&gt;&gt;lv : 5: to = neighbor(from, dir)
+en-&gt;&gt;&gt;gs : 6: hasBlock(to)
+en-&gt;&gt;&gt;lv : 7: behind = neighbor(to, dir)
+en-&gt;&gt;&gt;gs : 8: hasBlock(behind)
+en-&gt;&gt;&gt;lv : 9: t = tile(behind)
+en-&gt;&gt;&gt;gs : 10: [t == HOLE] next = withFill(to, to, behind)
+en-&gt;&gt;&gt;gs : 11: [그 외] next = withPush(to, to, behind)
+en-&gt;&gt;&gt;en + : 12: isCleared(lv, next)
+tick=
+se-&gt;&gt;&gt;se + : 13: undoStack.push(state), state = r.state()
+tick=
+ps-&gt;&gt;&gt;ps + : 14: animStep = r (블록 이동 / 소멸 애니메이션)
+tick=</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>860</w>
+<h>562</h>
+</coordinates>
+<panel_attributes>title=sd UC-12 Basic Course - 레벨 리셋
+desc=이동 횟수가 0이 아니면 확인 대화상자를 띄우고, 확인하면 초기 상태로 되돌린다.\nAlternate: 2a 취소 - 상태 유지 / 일시정지 메뉴의 "다시 시작"도 같은 reset() 을 쓴다
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+obj=&lt;&lt;UI&gt;&gt;\nJOptionPane~jo
+
+u-&gt;&gt;&gt;ps : 1: R 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ps + : 2: finishAnim()
+tick=
+ps-&gt;&gt;&gt;se : 3: n = moves()
+ps-&gt;&gt;&gt;jo : 4: [n != 0] r = showConfirmDialog(frame, 메시지, "리셋", ...)
+u-&gt;&gt;&gt;jo : 5: 확인 선택
+ps-&gt;&gt;&gt;se : 6: [확인 또는 n == 0] reset()</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

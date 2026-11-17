@@ -1,0 +1,24 @@
+id: L11
+name: 구멍과 목표
+optimalMoves: 17
+solution: UUTLTRLURTRBDDTDB
+layer 0
+----
+-$--
+----
+-#@#
+layer 1
+---.
+--$-
+----
+-#-.
+layer 2
+O-$-
+#---
+----
+----
+layer 3
+----
+----
+----
+----

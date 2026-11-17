@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>847</w>
+<h>470</h>
+</coordinates>
+<panel_attributes>title=sd UC-18 Basic Course - 난이도 점수 산출 및 곡선 검증
+desc=LevelTool 이 레벨마다 난이도 D 를 계산하고, 파일 순서대로 비감소 조건과 급등 한계(maxDeltaD)를 검사한다.\n게임 쪽에서는 LevelRepository.load 가 같은 Difficulty.score 로 레벨 목록을 D 오름차순 정렬한다.
+obj=레벨 디자이너~d ACTOR EXECUTION
+obj=&lt;&lt;tool&gt;&gt;\nLevelTool~lt
+obj=&lt;&lt;utility&gt;&gt;\nDifficulty~df
+
+d-&gt;&gt;&gt;lt : 1: 검증 실행: main(args)
+lt-&gt;&gt;&gt;df : 2: *[레벨마다] d = score(solved, cfg)
+lt-&gt;&gt;&gt;lt + : 3: *[i = 1 .. n-1] delta = ds[i] - ds[i-1]
+tick=
+lt-&gt;&gt;&gt;d : 4: [delta &lt; 0 또는 delta &gt; maxDeltaD] "[곡선 경고]" 출력</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

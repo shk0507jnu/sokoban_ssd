@@ -1,0 +1,10 @@
+id: L04
+name: 계단식
+optimalMoves: 5
+solution: RTLTR
+layer 0
+@--
+layer 1
+-$-
+layer 2
+--.

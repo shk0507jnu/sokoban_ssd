@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>694</w>
+<h>560</h>
+</coordinates>
+<panel_attributes>title=sd UC-19 Basic Course - 설정 값 조정
+desc=디자이너가 config/game.properties 를 고치면 다음 실행 때 읽어 적용한다.\nAlternate: 2a 값이 범위 밖이거나 형식 오류 - 기본값으로 대체하고 warnings 에 경고를 남긴다
+obj=레벨 디자이너~d ACTOR EXECUTION
+obj=&lt;&lt;controller&gt;&gt;\n_:App_~app
+obj=&lt;&lt;config&gt;&gt;\nGameConfig~gc
+
+d-&gt;&gt;&gt;app : 1: 설정 파일 수정 후 게임 또는 LevelTool 실행
+app-&gt;&gt;&gt;gc : 2: config = load(file)
+gc-&gt;&gt;&gt;gc + : 3: intOf(p, key, def, min, max) / doubleOf(p, key, def, min, max)
+tick=
+gc-&gt;&gt;&gt;gc + : 4: [값 오류] warnings.add(...), 기본값 사용
+tick=
+app-&gt;&gt;&gt;app + : 5: config.warnings 를 "[설정 경고]" 로 출력
+tick=</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

@@ -1,0 +1,12 @@
+id: L02
+name: 위로
+optimalMoves: 2
+solution: TT
+layer 0
+@
+layer 1
+$
+layer 2
+-
+layer 3
+.

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>1506</w>
+<h>838</h>
+</coordinates>
+<panel_attributes>title=sd UC-14 Basic Course - 레벨 클리어 및 결과 확인 (UC-15 기록 저장 포함)
+desc=마지막 이동 애니메이션이 끝나면 점수·별을 계산하고 기록을 갱신·저장한 뒤 결과 메뉴를 표시한다.\nAlternate: 2a 신기록이 아니면 기존 기록 유지 / 5a 마지막 레벨은 "다음 레벨" 없음 / UC-15 2a 저장 실패 - notify() 로 알림만
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+obj=&lt;&lt;utility&gt;&gt;\nScoring~sc
+obj=&lt;&lt;persistence&gt;&gt;\n_:SaveStore_~ss
+obj=&lt;&lt;controller&gt;&gt;\n_:App_~app
+obj=&lt;&lt;UI&gt;&gt;\n_:MenuList (clearMenu)_~ml CREATED_LATER
+
+ps-&gt;&gt;&gt;se : 1: tick(dt): 애니메이션 종료 후 isCleared()
+ps-&gt;&gt;&gt;ps + : 2: onCleared()
+tick=
+ps-&gt;&gt;&gt;se : 3: resScore = score()
+se-&gt;&gt;&gt;sc : 4: score(optimal, moves, undoCount, kappa)
+ps-&gt;&gt;&gt;se : 5: resStars = stars()
+se-&gt;&gt;&gt;sc : 6: stars(optimal, moves, r3, r2)
+ps-&gt;&gt;&gt;ss : 7: newRecord = update(level.id, resScore, resStars, moves)
+ps-&gt;&gt;&gt;ss : 8: [newRecord] save()  (UC-15)
+ps-&gt;&gt;&gt;app : 9: [IOException] notify(msg)
+ps-&gt;&gt;&gt;ml : 10: &lt;&lt;create&gt;&gt; MenuList("다음 레벨", "다시 도전", "레벨 선택")
+u-&gt;&gt;&gt;ps : 11: 항목 선택: keyPressed(e)
+ps-&gt;&gt;&gt;app : 12: clearAction(i): startLevel(levelIndex + 1)</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

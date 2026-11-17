@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>133</w>
+<h>112</h>
+</coordinates>
+<panel_attributes>&lt;&lt;enumeration&gt;&gt;
+*TileType*
+--
+EMPTY
+WALL
+HOLE
+GOAL
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>1745</x>
+<y>790</y>
+<w>273</w>
+<h>180</h>
+</coordinates>
+<panel_attributes>&lt;&lt;enumeration&gt;&gt;
+*Direction*
+--
+UP, RIGHT, DOWN, LEFT, ABOVE, BELOW
+--
++symbol: char
++dx: int
++dy: int
++dz: int
+--
+_+fromSymbol(c: char): Direction_
+_+symbols(): String_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>202</y>
+<w>427</w>
+<h>458</h>
+</coordinates>
+<panel_attributes>&lt;&lt;entity&gt;&gt;
+*Level*
+--
++id: String
++name: String
++w: int
++d: int
++h: int
+-tiles: TileType[]
++initial: GameState
++goals: int[]
++optimalMoves: int
++solution: String
++star3Ratio: Double
++star2Ratio: Double
++gimmicks: Map&lt;String, Integer&gt;
++source: String
+--
++idx(x: int, y: int, z: int): int
++x(idx: int): int
++y(idx: int): int
++z(idx: int): int
++cellCount(): int
++tile(idx: int): TileType
++neighbor(idx: int, dir: Direction): int
++blockCount(): int
++holeCount(): int
++usedLayers(): int
++withSolution(optimalMoves: int, solution: String): Level
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>577</x>
+<y>202</y>
+<w>434</w>
+<h>282</h>
+</coordinates>
+<panel_attributes>&lt;&lt;entity&gt;&gt;
+*GameState*
+--
++player: int
+-blocks: int[]
+-holes: int[]
+-hash: int
+--
+_+of(player: int, blocks: int[], holes: int[]): GameState_
++blockCount(): int
++holeCount(): int
++block(i: int): int
++hole(i: int): int
++hasBlock(idx: int): boolean
++isHole(idx: int): boolean
++withPlayer(newPlayer: int): GameState
++withPush(newPlayer: int, from: int, to: int): GameState
++withFill(newPlayer: int, from: int, hole: int): GameState
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>1161</x>
+<y>790</y>
+<w>434</w>
+<h>96</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Engine*
+--
+_+step(lv: Level, s: GameState, dir: Direction): StepResult_
+_+isCleared(lv: Level, s: GameState): boolean_
+_-walkable(lv: Level, s: GameState, idx: int): boolean_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>1161</x>
+<y>202</y>
+<w>189</w>
+<h>202</h>
+</coordinates>
+<panel_attributes>&lt;&lt;record&gt;&gt;
+*StepResult*
+--
++state: GameState
++dir: Direction
++playerFrom: int
++playerTo: int
++blockFrom: int
++blockTo: int
++blockVanished: boolean
++cleared: boolean
+--
++pushed(): boolean
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>790</y>
+<w>322</w>
+<h>394</h>
+</coordinates>
+<panel_attributes>&lt;&lt;entity&gt;&gt;
+*Session*
+--
+-level: Level
+-config: GameConfig
+-state: GameState
+-undoStack: Deque&lt;GameState&gt;
+-redoStack: Deque&lt;GameState&gt;
+-undoCount: int
+-cleared: boolean
+--
++Session(level: Level, config: GameConfig)
++level(): Level
++state(): GameState
++moves(): int
++undoCount(): int
++isCleared(): boolean
++canUndo(): boolean
++canRedo(): boolean
++move(dir: Direction): StepResult
++undo(): boolean
++redo(): boolean
++reset()
++score(): int
++stars(): int
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>0</x>
+<y>1294</y>
+<w>567</w>
+<h>96</h>
+</coordinates>
+<panel_attributes>&lt;&lt;utility&gt;&gt;
+*Scoring*
+--
+_+score(optimal: int, moves: int, undoCount: int, kappa: int): int_
+_+stars(optimal: int, moves: int, star3Ratio: double, star2Ratio: double): int_
+_+limit(optimal: int, ratio: double): int_
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>UMLClass</id>
+<coordinates>
+<x>647</x>
+<y>1294</y>
+<w>222</w>
+<h>64</h>
+</coordinates>
+<panel_attributes>&lt;&lt;config&gt;&gt;
+*GameConfig*
+--
+(sokoban.config, CD-03 참조)
+layer=1
+bg=white</panel_attributes>
+<additional_attributes/>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>44</x>
+<y>92</y>
+<w>42</w>
+<h>130</h>
+</coordinates>
+<panel_attributes>lt=-&gt;
+m2=1..*
+tiles</panel_attributes>
+<additional_attributes>20;110;20;65;22;65;22;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>407</x>
+<y>238</y>
+<w>190</w>
+<h>75</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-
+m2=1
+initial</panel_attributes>
+<additional_attributes>20;55;95;55;95;20;170;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>991</x>
+<y>222</y>
+<w>190</w>
+<h>56</h>
+</coordinates>
+<panel_attributes>lt=-&gt;
+m2=1
+state</panel_attributes>
+<additional_attributes>170;20;95;20;95;36;20;36</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>1236</x>
+<y>384</y>
+<w>162</w>
+<h>426</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;create&gt;&gt;</panel_attributes>
+<additional_attributes>142;406;142;213;20;213;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>948</x>
+<y>464</y>
+<w>277</w>
+<h>346</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>257;326;257;173;20;173;20;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>1575</x>
+<y>799</y>
+<w>190</w>
+<h>65</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;20;95;20;95;45;170;45</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>44</x>
+<y>640</y>
+<w>61</w>
+<h>170</h>
+</coordinates>
+<panel_attributes>lt=-&gt;
+m2=1
+level</panel_attributes>
+<additional_attributes>20;150;20;85;41;85;41;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>270</x>
+<y>464</y>
+<w>371</w>
+<h>346</h>
+</coordinates>
+<panel_attributes>lt=&lt;&lt;&lt;&lt;-
+m2=0..*
+state, undoStack, redoStack</panel_attributes>
+<additional_attributes>20;326;20;256;351;256;351;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>302</x>
+<y>799</y>
+<w>879</w>
+<h>129</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;109;440;109;440;20;859;20</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>44</x>
+<y>1164</y>
+<w>89</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=.&gt;
+&lt;&lt;use&gt;&gt;</panel_attributes>
+<additional_attributes>20;20;20;75;69;75;69;130</additional_attributes>
+</element>
+<element>
+<id>Relation</id>
+<coordinates>
+<x>270</x>
+<y>1164</y>
+<w>508</w>
+<h>150</h>
+</coordinates>
+<panel_attributes>lt=-&gt;
+m2=1
+config</panel_attributes>
+<additional_attributes>20;20;20;75;488;75;488;130</additional_attributes>
+</element>
+<element>
+<id>UMLNote</id>
+<coordinates>
+<x>1161</x>
+<y>0</y>
+<w>300</w>
+<h>110</h>
+</coordinates>
+<panel_attributes>CD-02 core (게임 규칙)
+밑줄 = static 멤버
+GameState 는 불변 객체: 되돌리기 스냅샷과
+솔버가 공유한다 (NFR-3)
+Engine 은 Level, GameState, Direction 을
+인자로 받는다
+bg=#FFFFE0</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>

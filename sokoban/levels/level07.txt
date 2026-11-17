@@ -1,0 +1,24 @@
+id: L07
+name: 첫 구멍
+optimalMoves: 8
+solution: TDDLTLBB
+layer 0
+#--
+---
+.-#
+---
+layer 1
+--@
+--#
+---
+---
+layer 2
+---
+--$
+-$-
+#--
+layer 3
+--O
+---
+---
+---

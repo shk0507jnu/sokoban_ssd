@@ -1,0 +1,24 @@
+id: L08
+name: 둘씩 둘
+optimalMoves: 13
+solution: URBLBLTUTDDBB
+layer 0
+---
+-#-
+.--
+---
+layer 1
+---
+---
+-#-
+---
+layer 2
+---
+-$-
+$--
+-#-
+layer 3
+-#-
+---
+-@-
+.--

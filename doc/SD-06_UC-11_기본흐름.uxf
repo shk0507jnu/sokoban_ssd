@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.1">
+<zoom_level>10</zoom_level>
+<element>
+<id>UMLSequenceAllInOne</id>
+<coordinates>
+<x>0</x>
+<y>0</y>
+<w>660</w>
+<h>538</h>
+</coordinates>
+<panel_attributes>title=sd UC-11 Basic Course - 다시 하기
+desc=되돌렸던 입력을 다시 적용한다.\nAlternate: 1a redo 기록이 없음 - redo() 가 false / 새 유효 이동 move() 가 일어나면 redoStack.clear()
+obj=사용자~u ACTOR EXECUTION
+obj=&lt;&lt;UI&gt;&gt;\n_:PlayScreen_~ps
+obj=&lt;&lt;entity&gt;&gt;\n_:Session_~se
+
+u-&gt;&gt;&gt;ps : 1: Y 입력: keyPressed(e)
+ps-&gt;&gt;&gt;ps + : 2: finishAnim()
+tick=
+ps-&gt;&gt;&gt;se : 3: ok = redo()
+se-&gt;&gt;&gt;se + : 4: undoStack.push(state), state = redoStack.pop()
+tick=
+ps-&gt;&gt;&gt;se : 5: HUD 갱신: moves()</panel_attributes>
+<additional_attributes/>
+</element>
+</diagram>
